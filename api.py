@@ -3,6 +3,7 @@ from rembg import remove
 import io
 import json
 import tempfile
+import os
 
 @route('/detourer_image', method='POST')
 def detourer_image():
@@ -11,18 +12,16 @@ def detourer_image():
         return HTTPResponse(body=json.dumps(error_response), status=400, content_type='application/json')
 
     image = request.files.get('image')
-    
-    with tempfile.NamedTemporaryFile(delete=False) as img_temp:
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix='.png') as img_temp:
         img_temp.write(image.file.read())
         img_temp.flush()
+        img_temp_path = img_temp.name
 
-        img_temp.seek(0)  # Reset the file pointer to the beginning of the file
-        img_binary = io.BytesIO(img_temp.read())  # Convert the temporary file to an in-memory binary stream
-        img_result = remove(img_binary)
+    with open(img_temp_path, 'rb') as img_file:
+        img_result_bytes = io.BytesIO(remove(img_file.read()))
 
-    img_result_bytes = io.BytesIO()
-    img_result.save(img_result_bytes, format='PNG')
-    img_result_bytes.seek(0)
+    os.remove(img_temp_path)
 
     response.content_type = 'image/png'
     response.set_header('Content-Disposition', 'attachment; filename=result.png')
