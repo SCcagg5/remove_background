@@ -1,11 +1,8 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, Response
 from rembg import remove
 import io
-import base64
 
 app = Flask(__name__)
-
-app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
 
 @app.route('/detourer_image', methods=['POST'])
 def detourer_image():
@@ -18,10 +15,13 @@ def detourer_image():
     img_result_bytes = io.BytesIO()
     img_result.save(img_result_bytes, format='PNG')
     img_result_bytes.seek(0)
-    
-    response = send_file(img_result_bytes, mimetype='image/png')
+
+    def generate_response():
+        yield img_result_bytes.getvalue()
+
+    response = Response(generate_response(), content_type='image/png')
     response.headers['Content-Disposition'] = 'attachment; filename=result.png'
-    
+
     return response
 
 if __name__ == '__main__':
