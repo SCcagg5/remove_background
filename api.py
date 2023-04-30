@@ -1,11 +1,13 @@
-from bottle import route, run, request, response
+from bottle import route, run, request, response, HTTPResponse
 from rembg import remove
 import io
+import json
 
 @route('/detourer_image', method='POST')
 def detourer_image():
     if 'image' not in request.files:
-        return {'error': 'Pas d\'image envoyée'}, 400
+        error_response = {'error': 'Pas d\'image envoyée'}
+        return HTTPResponse(body=json.dumps(error_response), status=400, content_type='application/json')
 
     image = request.files.get('image')
     img = io.BytesIO(image.file.read())
