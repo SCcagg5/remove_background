@@ -16,7 +16,8 @@ def detourer_image():
         img_temp.write(image.file.read())
         img_temp.flush()
 
-        img_result = remove(img_temp.name)
+        img_temp.seek(0)  # Reset the file pointer to the beginning of the file
+        img_result = remove(img_temp)
 
     img_result_bytes = io.BytesIO()
     img_result.save(img_result_bytes, format='PNG')
