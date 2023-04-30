@@ -1,4 +1,3 @@
-# Utiliser une image Python officielle comme base
 FROM python:3.9-slim
 
 # Définir le répertoire de travail
@@ -14,5 +13,5 @@ COPY api.py .
 # Exposer le port 8080 pour l'API
 EXPOSE 8080
 
-# Lancer l'application Flask
-CMD ["gunicorn", "-b", "0.0.0.0:8080", "api:app"]
+# Lancer l'application Flask sans Gunicorn
+CMD ["python", "api.py"]
