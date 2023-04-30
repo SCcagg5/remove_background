@@ -5,6 +5,8 @@ import base64
 
 app = Flask(__name__)
 
+app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024
+
 @app.route('/detourer_image', methods=['POST'])
 def detourer_image():
     if 'image' not in request.files:
@@ -23,4 +25,4 @@ def detourer_image():
     return response
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8080, debug=True)
