@@ -2,6 +2,7 @@ from bottle import route, run, request, response, HTTPResponse
 from rembg import remove
 import io
 import json
+import tempfile
 
 @route('/detourer_image', method='POST')
 def detourer_image():
@@ -10,8 +11,13 @@ def detourer_image():
         return HTTPResponse(body=json.dumps(error_response), status=400, content_type='application/json')
 
     image = request.files.get('image')
-    img = io.BytesIO(image.file.read())
-    img_result = remove(img)
+    
+    with tempfile.NamedTemporaryFile(delete=False) as img_temp:
+        img_temp.write(image.file.read())
+        img_temp.flush()
+
+        img_result = remove(img_temp.name)
+
     img_result_bytes = io.BytesIO()
     img_result.save(img_result_bytes, format='PNG')
     img_result_bytes.seek(0)
